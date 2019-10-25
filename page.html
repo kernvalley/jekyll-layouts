@@ -2,7 +2,7 @@
 <html
 	lang="{{ site.lang | default: 'en' }}"
 	dir="{{ site.dir | default: 'ltr' }}"
-	class="no-js scroll-smooth"
+	class="no-js scroll-smooth background-primary color-default font-main border-box"
 	itemtype="{{ page.itemtype | default: 'http://schema.org/WebPage' }}"
 	itemscope=""
 	{% if site.service_worker %}data-service-worker="{{site.service_worker | absolute_url }}"{% endif %}
@@ -14,7 +14,7 @@
 	<body
 		id="top"
 		{% if page.scene %}data-scene="{{ page.scene }}"{% endif %}
-		class="layout-{{ page.layout }} {{ page.body-class | default: 'border-box smooth-scroll font-main color-default background-default' }}"
+		class="layout-{{ page.layout }} {{ page.body-class | default: 'grid' }}"
 		contextmenu="{{ page.contextmenu | default: site.contextmenu }}"
 		{% if page.itemprop and page.itemtype %}
 			itemprop="{{ page.itemprop }}"
