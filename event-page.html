@@ -24,38 +24,66 @@
 	>
 		{% include header.html %}
 		<main class="card shadow event" itemtype="https://schema.org/Event" itemscope="">
-			<header>
+			<header class="event-page-header card shadow">
 				{% if page.description %}
 					<meta itemprop="description" content="{{ page.description }}" />
 				{% endif %}
-				<h1 itemprop="name">{{ page.title }}</h1>
-				<figure itemprop="image" itemtype="https://schema.org/ImageObject" itemscope="">
-					{% include imgur.html url=page.imgur itemprop="url" %}
+				<h1 itemprop="name" class="center">{{ page.title }}</h1>
+				<div class="flex row wrap event-details">
+					<div class="card inline-block shadow clearfix">
+						<h4 class="center">Date &amp; Time</h4>
+						{% include icon.html icon='events' class="current-color icon float-left" %}
+						<span class="float-left">&nbsp;</span>
+						<div class="float-left">
+							From: <time datetime="{{ page.startDate | date_to_xmlschema }}" itemprop="startDate">{{ page.startDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
+							<br />
+							To: <time datetime="{{ page.endDate | date_to_xmlschema }}" itemprop="endDate">{{ page.endDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
+						</div>
+					</div>
+					<div class="clearfix card shadow inline-block" itemprop="location" itemtype="https://schema.org/Place" itemscope="">
+						<h4 class="center">Location</h4>
+						{% include icon.html icon='location' class='current-color icon float-left' %}
+						<span class="float-left">&nbsp;</span>
+						<div class="float-left">
+							{% if page.location.name %}
+								<b itemprop="name">{{ page.location.name }}</b>
+							{% else %}
+								<span>Location</span>
+							{% endif %}
+							<address itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
+								<span itemprop="streetAddress">{{ page.location.streetAddress }}</span>
+								<br />
+								<span itemprop="addressLocality">{{ page.location.addressLocality }}</span>,
+								<span itemprop="addressRegion">{{ page.location.addressRegion }}</span>
+								<meta itemprop="addressCountry" content="{{ page.location.addressCountry | default: 'USA' }}" />
+							</address>
+						</div>
+					</div>
+				</div>
+				<figure class="center" itemprop="image" itemtype="https://schema.org/ImageObject" itemscope="">
+					{% include imgur.html url=page.imgur itemprop="url" class="imgur" %}
 				</figure>
-				<h2>
-					<time datetime="{{ page.startDate | date_to_xmlschema }}" itemprop="startDate">{{ page.startDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
-					<span>&mdash;</span>
-					<time datetime="{{ page.endDate | date_to_xmlschema }}" itemprop="endDate">{{ page.endDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
-				</h2>
-				<details itemprop="location" itemtype="https://schema.org/Place" itemscope="">
-					<summary>
-						{% include icon.html icon='location' %}
-						{% if page.location.name %}
-							<b itemprop="name">{{ page.location.name }}</b>
-						{% else %}
-							<span>Location</span>
-						{% endif %}
-					</summary>
-					<address itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
-						<span itemprop="streetAddress">{{ page.location.streetAddress }}</span>
-						<br />
-						<span itemprop="addressLocality">{{ page.location.addressLocality }}</span>,
-						<span itemprop="addressRegion">{{ page.location.addressRegion }}</span>
-						<meta itemprop="addressCountry" content="{{ page.location.addressCountry | default: 'USA' }}" />
-					</address>
-				</details>
+				{% if page.offers %}<hr /><div class="flex row wrap event-page-offers">{% for offer in page.offers %}
+					<button type="button" class="center btn cursor-default event-offer-btn" itemprop="offers" itemtype="http://schema.org/Offer" itemscope=""{% if offer.availability and offer.availability != 'InStock' %} title="Unavailable" disabled=""{% endif %}>
+						<b class="event-price">
+							<span itemprop="name">{{ offer.name | default: 'General Admission' }}</span>:
+							$<span itemprop="price">{{ offer.price }}</span>
+						</b>
+						<meta itemprop="priceCurrency" content="{{ offer.eventCurrency | default: 'USD' }}" />
+						<link itemprop="availability" href="https://schema.org/{{ offer.availability | default: 'InStock' }}" />
+					</button>
+				{% endfor %}</div>{% else %}
+					<button type="button" class="center btn" itemprop="offers" itemtype="http://schema.org/Offer" itemscope=""{% if offer.availability and offer.availability != 'InStock' %} disabled=""{% endif %}>
+						<b class="event-price">
+							<span itemprop="name">Admission</span>:
+							<span>Free</span>
+						</b>
+						<meta itemprop="price" content="0" />
+						<meta itemprop="priceCurrency" content="{{ offer.eventCurrency | default: 'USD' }}" />
+						<link itemprop="availability" href="https://schema.org/{{ offer.availability | default: 'InStock' }}" />
+					</button>
+				{% endif %}
 			</header>
-			<hr />
 			<article itemprop="about" itemtype="https://schema.org/Article" itemscope="">
 				<div itemprop="author" itemtype="https://schema.org/{{ page.organizer['@type'] | default: 'Organization' }}" itemscope="" hidden="">
 					{% if page.organizer.name %}
@@ -100,7 +128,7 @@
 					<meta itemprop="dateModified" content="{{ page.date | date: data_to_xmlschema }}" />
 				{% endif %}
 				<section itemtype="articleBody">{{ content }}</section>
-				<footer itemprop="publisher" itemtype="https://schema.org/{{ site.data.publisher['@type'] | default: 'Organization' }}" itemscope="">
+				<footer itemprop="publisher" itemtype="https://schema.org/{{ site.data.publisher['@type'] | default: 'Organization' }}" itemscope="" hidden="">
 					<a href="{{ site.data.publisher.url }}" rel="external noopener" itemprop="url">
 						<figure itemprop="logo" itemtype="https://schema.org/ImageObject" itemscope="" hidden="">
 							<meta itemprop="url" content="{{ site.data.publisher.logo.url }}" />
