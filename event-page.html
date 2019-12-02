@@ -1,144 +1,152 @@
-<!DOCTYPE html>
-<html
-	lang="{{ site.lang | default: 'en' }}"
-	dir="{{ site.dir | default: 'ltr' }}"
-	class="no-js scroll-smooth background-primary color-default font-main border-box"
-	itemtype="{{ page.itemtype | default: 'http://schema.org/WebPage' }}"
-	itemscope=""
-	{% if site.service_worker %}data-service-worker="{{ site.service_worker }}"{% endif %}
-	{% if site.google-analytics %}data-google-analytics="{{ site.google-analytics }}"{% endif %}
-	{% if page.ads %}data-ad-sense-id="{{ site.ad-sense }}"{% endif %}
-	{% if page.pageLevelAds %}data-page-level-ads="{{ page.pageLevelAds }}"{% endif %}
->
-{% include head.html %}
-	<body
-		id="top"
-		{% if page.scene %}data-scene="{{ page.scene }}"{% endif %}
-		class="layout-{{ page.layout }} {{ page.body-class | default: 'grid' }}"
-		contextmenu="{{ page.contextmenu | default: site.contextmenu }}"
-		{% if page.itemprop and page.itemtype %}
-			itemprop="{{ page.itemprop }}"
-			itemtype="{{ page.itemtype }}"
-			itemscope=""
+---
+name: event
+theme: default
+og-type: website
+data-layout: 'right-sidebar'
+data-theme: auto
+itemtype: 'https://schema.org/WebPage'
+layout: base
+sidebar: true
+main-itemtype: Event
+---
+{% include header.html %}
+<main id="main" class="card shadow" itemtype="https://schema.org/Event" itemscope="" itemref="time-card place-card">
+	<header class="event-page-header">
+		{% if page.description %}
+			<meta itemprop="description" content="{{ page.description }}" />
 		{% endif %}
-	>
-		{% include header.html %}
-		<main class="card shadow event" itemtype="https://schema.org/Event" itemscope="">
-			<header class="event-page-header">
-				{% if page.description %}
-					<meta itemprop="description" content="{{ page.description }}" />
-				{% endif %}
-				<h1 itemprop="name" class="center">{{ page.name | default: page.title }}</h1>
-				<div class="flex row wrap event-details">
-					<div class="card inline-block shadow clearfix">
-						<h4 class="center">Date &amp; Time</h4>
-						{% include icon.html icon='events' class="current-color icon float-left" %}
-						<span class="float-left">&nbsp;</span>
-						<div class="float-left">
-							From: <time datetime="{{ page.startDate | date_to_xmlschema }}" itemprop="startDate">{{ page.startDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
-							<br />
-							To: <time datetime="{{ page.endDate | date_to_xmlschema }}" itemprop="endDate">{{ page.endDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
-						</div>
-					</div>
-					<div class="clearfix card shadow inline-block" itemprop="location" itemtype="https://schema.org/Place" itemscope="">
-						<h4 class="center">Location</h4>
-						{% include icon.html icon='location' class='current-color icon float-left' %}
-						<span class="float-left">&nbsp;</span>
-						<div class="float-left">
-							{% if page.location.name %}
-								<b itemprop="name">{{ page.location.name }}</b>
-							{% else %}
-								<span>Location</span>
-							{% endif %}
-							<address itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
-								<span itemprop="streetAddress">{{ page.location.streetAddress }}</span>
-								<br />
-								<span itemprop="addressLocality">{{ page.location.addressLocality }}</span>,
-								<span itemprop="addressRegion">{{ page.location.addressRegion }}</span>
-								<meta itemprop="addressCountry" content="{{ page.location.addressCountry | default: 'USA' }}" />
-							</address>
-						</div>
-					</div>
-				</div>
-				<figure class="center" itemprop="image" itemtype="https://schema.org/ImageObject" itemscope="">
-					{% include imgur.html url=page.imgur itemprop="url" class="imgur" %}
+		<h1 itemprop="name" class="center">{{ page.name | default: page.title }}</h1>
+		<!-- <div itemtype="https://schema.org/Place" itemprop="location" itemref="place-card" hidden=""></div> -->
+		<figure class="center" itemprop="image" itemtype="https://schema.org/ImageObject" itemscope="">
+			{% include imgur.html url=page.imgur itemprop="url" class="imgur" %}
+		</figure>
+		{% if page.offers %}<hr /><div class="flex row wrap event-page-offers">{% for offer in page.offers %}
+			<button type="button" class="center btn cursor-default event-offer-btn" itemprop="offers" itemtype="http://schema.org/Offer" itemscope=""{% if offer.availability and offer.availability != 'InStock' %} title="Unavailable" disabled=""{% endif %}>
+				<b class="event-price">
+					<span itemprop="name">{{ offer.name | default: 'General Admission' }}</span>:
+					$<span itemprop="price">{{ offer.price }}</span>
+				</b>
+				<meta itemprop="priceCurrency" content="{{ offer.eventCurrency | default: 'USD' }}" />
+				<link itemprop="availability" href="https://schema.org/{{ offer.availability | default: 'InStock' }}" />
+			</button>
+		{% endfor %}</div>{% else %}
+			<button type="button" class="center btn" itemprop="offers" itemtype="http://schema.org/Offer" itemscope=""{% if offer.availability and offer.availability != 'InStock' %} disabled=""{% endif %}>
+				<b class="event-price">
+					<span itemprop="name">Admission</span>:
+					<span>Free</span>
+				</b>
+				<meta itemprop="price" content="0" />
+				<meta itemprop="priceCurrency" content="{{ offer.eventCurrency | default: 'USD' }}" />
+				<link itemprop="availability" href="https://schema.org/{{ offer.availability | default: 'InStock' }}" />
+			</button>
+		{% endif %}
+	</header>
+	<article itemprop="about" itemtype="https://schema.org/Article" itemscope="">
+		<div itemprop="author" itemtype="https://schema.org/{{ page.organizer['@type'] | default: 'Organization' }}" itemscope="" hidden="">
+			{% if page.organizer.name %}
+				<meta itemprop="name" content="{{ page.organizer.name }}" />
+			{% elsif page.organizer.givenName and page.organizer.familyName %}
+				<meta itemprop="name" content="{{ page.organizer.givenName }} {{ page.organizer.familyName }}" />
+			{% endif %}
+			{% if page.organizer.url %}<meta itemprop="url" content="{{ page.organizer.url }}">{% endif %}
+		</div>
+		{% if page.description %}
+			<meta itemprop="description" content="{{ page.description }}" />
+		{% endif %}
+		{% if page.tags %}
+			<meta itemprop="keywords" content="{{ page.tags | join: ', '}}" />
+		{% endif %}
+		{% if page.imgur %}
+			{% capture hash %}{{ include.url | replace: 'https://i.imgur.com/', '' | replace: 'https://imgur.com/', '' | replace: '.png', '' | replace: '.jpg', '' }}{% endcapture %}
+			<meta itemprop="image" content="https://i.imgur.com/{{ hash }}m.png" />
+		{% elsif page.image %}
+			<meta itemprop="image" content="{{ page.image  }}" />
+		{% endif %}
+		<meta itemptop="wordCount" content="{{ content | number_of_words }}" />
+		<meta itemprop="url" content="{{ page.url  }}" />
+		<meta itemprop="datePublished" content="{{ page.date | date_to_xmlschema }}" />
+		<meta itemprop="headline" content="{{ page.title }}">
+		{% if page.date %}
+			<b class="meta-date-posted">
+				<span>Posted on</span>
+				<time itemprop="datePublished" datetime="{{ page.date | date: data_to_xmlschema }}">
+					{{ page.date | date: '%a, %B %e, %Y' }}
+				</time>
+			</b>
+		{% endif %}
+		{% if page.updated %}
+			<b class="meta-date-updated">
+				<span>Updated on</span>
+				<time itemprop="dateModified" datetime="{{ page.updated | date: data_to_xmlschema }}">
+					{{ page.updated | date: '%a, %B %e, %Y' }}
+				</time>
+			</b>
+		{% else %}
+			<meta itemprop="dateModified" content="{{ page.date | date: data_to_xmlschema }}" />
+		{% endif %}
+		<section itemtype="articleBody">{{ content }}</section>
+		<footer itemprop="publisher" itemtype="https://schema.org/{{ site.data.publisher['@type'] | default: 'Organization' }}" itemscope="" hidden="">
+			<a href="{{ site.data.publisher.url }}" rel="external noopener" itemprop="url">
+				<figure itemprop="logo" itemtype="https://schema.org/ImageObject" itemscope="" hidden="">
+					<meta itemprop="url" content="{{ site.data.publisher.logo.url }}" />
 				</figure>
-				{% if page.offers %}<hr /><div class="flex row wrap event-page-offers">{% for offer in page.offers %}
-					<button type="button" class="center btn cursor-default event-offer-btn" itemprop="offers" itemtype="http://schema.org/Offer" itemscope=""{% if offer.availability and offer.availability != 'InStock' %} title="Unavailable" disabled=""{% endif %}>
-						<b class="event-price">
-							<span itemprop="name">{{ offer.name | default: 'General Admission' }}</span>:
-							$<span itemprop="price">{{ offer.price }}</span>
-						</b>
-						<meta itemprop="priceCurrency" content="{{ offer.eventCurrency | default: 'USD' }}" />
-						<link itemprop="availability" href="https://schema.org/{{ offer.availability | default: 'InStock' }}" />
-					</button>
-				{% endfor %}</div>{% else %}
-					<button type="button" class="center btn" itemprop="offers" itemtype="http://schema.org/Offer" itemscope=""{% if offer.availability and offer.availability != 'InStock' %} disabled=""{% endif %}>
-						<b class="event-price">
-							<span itemprop="name">Admission</span>:
-							<span>Free</span>
-						</b>
-						<meta itemprop="price" content="0" />
-						<meta itemprop="priceCurrency" content="{{ offer.eventCurrency | default: 'USD' }}" />
-						<link itemprop="availability" href="https://schema.org/{{ offer.availability | default: 'InStock' }}" />
-					</button>
-				{% endif %}
-			</header>
-			<article itemprop="about" itemtype="https://schema.org/Article" itemscope="">
-				<div itemprop="author" itemtype="https://schema.org/{{ page.organizer['@type'] | default: 'Organization' }}" itemscope="" hidden="">
-					{% if page.organizer.name %}
-						<meta itemprop="name" content="{{ page.organizer.name }}" />
-					{% elsif page.organizer.givenName and page.organizer.familyName %}
-						<meta itemprop="name" content="{{ page.organizer.givenName }} {{ page.organizer.familyName }}" />
-					{% endif %}
-					{% if page.organizer.url %}<meta itemprop="url" content="{{ page.organizer.url }}">{% endif %}
-				</div>
-				{% if page.description %}
-					<meta itemprop="description" content="{{ page.description }}" />
-				{% endif %}
-				{% if page.tags %}
-					<meta itemprop="keywords" content="{{ page.tags | join: ', '}}" />
-				{% endif %}
-				{% if page.imgur %}
-					{% capture hash %}{{ include.url | replace: 'https://i.imgur.com/', '' | replace: 'https://imgur.com/', '' | replace: '.png', '' | replace: '.jpg', '' }}{% endcapture %}
-					<meta itemprop="image" content="https://i.imgur.com/{{ hash }}m.png" />
-				{% elsif page.image %}
-					<meta itemprop="image" content="{{ page.image  }}" />
-				{% endif %}
-				<meta itemptop="wordCount" content="{{ content | number_of_words }}" />
-				<meta itemprop="url" content="{{ page.url  }}" />
-				<meta itemprop="datePublished" content="{{ page.date | date_to_xmlschema }}" />
-				<meta itemprop="headline" content="{{ page.title }}">
-				{% if page.date %}
-					<b class="meta-date-posted">
-						<span>Posted on</span>
-						<time itemprop="datePublished" datetime="{{ page.date | date: data_to_xmlschema }}">
-							{{ page.date | date: '%a, %B %e, %Y' }}
-						</time>
-					</b>
-				{% endif %}
-				{% if page.updated %}
-					<b class="meta-date-updated">
-						<span>Updated on</span>
-						<time itemprop="dateModified" datetime="{{ page.updated | date: data_to_xmlschema }}">
-							{{ page.updated | date: '%a, %B %e, %Y' }}
-						</time>
-					</b>
-				{% else %}
-					<meta itemprop="dateModified" content="{{ page.date | date: data_to_xmlschema }}" />
-				{% endif %}
-				<section itemtype="articleBody">{{ content }}</section>
-				<footer itemprop="publisher" itemtype="https://schema.org/{{ site.data.publisher['@type'] | default: 'Organization' }}" itemscope="" hidden="">
-					<a href="{{ site.data.publisher.url }}" rel="external noopener" itemprop="url">
-						<figure itemprop="logo" itemtype="https://schema.org/ImageObject" itemscope="" hidden="">
-							<meta itemprop="url" content="{{ site.data.publisher.logo.url }}" />
-						</figure>
-						<h5 itemprop="name">{{ site.data.publisher.name }}</h5>
-					</a>
-				</footer>
-			</article>
-		</main>
-		{% include footer.html %}
-		{% include share-button.html %}
-	</body>
-</html>
+				<h5 itemprop="name">{{ site.data.publisher.name }}</h5>
+			</a>
+		</footer>
+	</article>
+</main>
+<aside id="sidebar" class="card shadow">
+	<div class="card clearfix" id="time-card">
+		<h4 class="center">When</h4>
+		{% include icon.html icon='events' class="current-color icon float-left" %}
+		<span class="float-left"> </span>
+		<div class="float-left">
+			<time datetime="{{ page.startDate | date_to_xmlschema }}" itemprop="startDate">{{ page.startDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
+			<span>&mdash;</span>
+			<time datetime="{{ page.endDate | date_to_xmlschema }}" itemprop="endDate">{{ page.endDate | date: '%a %b %-d, %Y %l:%M %p'}}</time>
+		</div>
+	</div>
+	<br />
+	<div class="clearfix card" itemprop="location" itemtype="https://schema.org/Place" id="place-card" itemscope="">
+		<h4 class="center">Where</h4>
+		{% include icon.html icon='location' class='current-color icon float-left' %}
+		<span class="float-left">&nbsp;</span>
+		{% if page.location.name %}
+			<b class="float-left" itemprop="name">{{ page.location.name }}</b>
+		{% endif %}
+		<address itemprop="address" itemtype="https://schema.org/PostalAddress" itemscope="">
+			<span itemprop="streetAddress">{{ page.location.streetAddress }}</span>
+			<br />
+			<span itemprop="addressLocality">{{ page.location.addressLocality }}</span>,
+			<span itemprop="addressRegion">{{ page.location.addressRegion | default: 'CA' }}</span>
+			<meta itemprop="postalCode" content="{{  page.location.postalCode }}" />
+			<meta itemprop="addressCountry" content="{{ page.location.addressCountry | default: 'USA' }}" />
+		</address>
+		{% if page.location.geo %}
+			<open-street-map center="{{ page.location.geo.latitude }},{{ page.location.geo.longitude }}" zoom="15" itemprop="geo" itemtype="https://schema.org/GeoCoordinates" itemscope="">
+				<meta itemprop="longitude" content="{{ page.location.geo.longitude }}" />
+				<meta itemprop="latitude" content="{{ page.location.geo.latitude }}" />
+				<map-marker slot="markers" longitude="{{ page.location.geo.longitude }}" latitude="{{ page.location.geo.latitude }}" title="Kernville Cowork" open="">
+					<img src="https://cdn.kernvalley.us/img/adwaita-icons/actions/mark-location.svg" height="32" width="32" slot="icon" />
+					<div slot="popup">
+						{% if page.location.name %}
+							<h4>{{ page.location.name }}</h4>
+						{% endif %}
+						{% if page.location.image %}
+							<img src="{{ page.location.image.url }}" alt="{{ page.location.image.alt }}" height="{{ page.location.image.height }}" width="{{ page.location.image.width }}" crossorigin="anonymous" decoding="async" />
+						{% endif %}
+						<hr />
+						<address>
+							<div>{{ page.location.streetAddress }}</div>
+							<div>{{ page.location.addressLocality }}, {{ page.location.addressRegion | default: 'CA' }} {{ page.location.postalCode }}</div>
+						</address>
+						<br />
+						<a href="geo:{{ page.location.geo.latitude }},{{ page.location.geo.longitude }}">Open in Map App</a>
+					</div>
+				</map-marker>
+			</open-street-map>
+		{% endif %}
+	</div>
+</aside>
+{% include footer.html %}
+{% include share-button.html %}
