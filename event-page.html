@@ -136,10 +136,10 @@ main-itemtype: Event
 			<meta itemprop="addressCountry" content="{{ page.location.addressCountry | default: 'USA' }}" />
 		</address>
 		{% if page.location.geo %}
-			<open-street-map center="{{ page.location.geo.latitude }},{{ page.location.geo.longitude }}" zoom="15" itemprop="geo" itemtype="https://schema.org/GeoCoordinates" itemscope="">
+			<leaflet-map center="{{ page.location.geo.latitude }},{{ page.location.geo.longitude }}" zoom="15" crossorigin="annonymous" detectretina="" itemprop="geo" itemtype="https://schema.org/GeoCoordinates" itemscope="">
 				<meta itemprop="longitude" content="{{ page.location.geo.longitude }}" />
 				<meta itemprop="latitude" content="{{ page.location.geo.latitude }}" />
-				<map-marker slot="markers" longitude="{{ page.location.geo.longitude }}" latitude="{{ page.location.geo.latitude }}" title="Kernville Cowork" open="">
+				<leaflet-marker slot="markers" longitude="{{ page.location.geo.longitude }}" latitude="{{ page.location.geo.latitude }}" title="{{ page.location.name }}" open="">
 					<img src="https://cdn.kernvalley.us/img/adwaita-icons/actions/mark-location.svg" height="32" width="32" slot="icon" />
 					<div slot="popup">
 						{% if page.location.name %}
@@ -156,8 +156,8 @@ main-itemtype: Event
 						<br />
 						<a href="geo:{{ page.location.geo.latitude }},{{ page.location.geo.longitude }}">Open in Map App</a>
 					</div>
-				</map-marker>
-			</open-street-map>
+				</leaflet-marker>
+			</leaflet-map>
 		{% endif %}
 	</div>
 </aside>
